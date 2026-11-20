@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Experiment Readout</title>
+<meta name="description" content="Check an A/B test before you trust it, then get a ship, don't ship, run longer or fix-the-data call with the reasons.">
+<meta name="theme-color" content="#f6f7fb">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230f766e'/%3E%3Cpath d='M8 22V12m6 10V8m6 14v-6m6 6V10' stroke='white' stroke-width='2.6' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f6f7fb; --card:#fff; --ink:#141824; --muted:#5b6275; --faint:#8a90a0; --line:#e3e6ee;
+  --accent:#0f766e; --accent-soft:#e6f3f1; --a:#64748b; --b:#0f766e;
+  --ship:#15803d; --ship-soft:#e7f5ec; --no:#b91c1c; --no-soft:#fdecec; --longer:#a16207; --longer-soft:#fdf5e1; --fix:#7c3aed; --fix-soft:#f1ebfd;
+  --display:"Bricolage Grotesque",Arial,sans-serif; --body:"IBM Plex Sans",system-ui,sans-serif; --mono:"IBM Plex Mono",ui-monospace,monospace;
+}
+*{box-sizing:border-box}
+html,body{overflow-x:clip}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 16px/1.55 var(--body);-webkit-font-smoothing:antialiased}
+a{color:var(--accent)}
+h1,h2,h3{font-family:var(--display);letter-spacing:-.02em;margin:0;text-wrap:balance}
+.wrap{max-width:1180px;margin:0 auto;padding:0 20px}
+header.top{border-bottom:1px solid var(--line);background:#fff}
+header.top .wrap{display:flex;justify-content:space-between;align-items:center;gap:12px;height:60px}
+.brand{white-space:nowrap;font-family:var(--display);font-weight:700;font-size:19px;color:var(--ink);text-decoration:none;display:flex;align-items:center;gap:10px}
+.brand i{width:26px;height:26px;border-radius:7px;background:var(--accent);display:inline-block}
+.top nav{display:flex;gap:18px;font-size:14.5px}
+.top nav a{color:var(--muted);text-decoration:none;white-space:nowrap}
+.intro{padding:38px 0 24px}
+.ver{font:500 12.5px var(--mono);color:var(--accent);background:var(--accent-soft);padding:3px 9px;border-radius:999px}
+.intro h1{font-size:clamp(30px,4.6vw,48px);line-height:1.05;margin-top:14px;max-width:22ch}
+.intro p{color:var(--muted);font-size:18px;max-width:70ch;margin:14px 0 0}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:22px}
+.card h2{font-size:21px}
+.sub{color:var(--muted);font-size:14.5px;margin:4px 0 0}
+.step{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.step b{width:28px;height:28px;border-radius:50%;background:var(--ink);color:#fff;display:grid;place-items:center;font:600 14px var(--body);flex:none}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin:16px 0}
+.tabs button{border:1px solid var(--line);background:#fff;border-radius:999px;padding:8px 14px;font:600 14px var(--body);color:var(--muted);cursor:pointer}
+.tabs button[aria-pressed="true"]{border-color:var(--ink);color:var(--ink)}
+.demos{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.demo{text-align:left;border:1px solid var(--line);background:#fff;border-radius:14px;padding:16px;cursor:pointer;font:inherit;color:inherit;display:flex;flex-direction:column;gap:6px;transition:border-color .15s}
+.demo:hover,.demo[aria-pressed="true"]{border-color:var(--accent)}
+.demo[aria-pressed="true"]{background:var(--accent-soft)}
+.demo b{font-family:var(--display);font-size:18px}
+.demo span{font-size:14px;color:var(--muted)}
+.field{display:flex;flex-direction:column;gap:5px;font-size:14px}
+.field>span{font-weight:600;color:var(--muted);font-size:13px}
+select,input[type=number],input[type=text]{padding:9px 11px;border:1px solid var(--line);border-radius:9px;font:15px var(--body);background:#fff;color:var(--ink);width:100%}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.checks-in{display:flex;flex-wrap:wrap;gap:8px 16px;font-size:14.5px}
+.checks-in label{display:flex;gap:6px;align-items:center}
+.btn{border:1px solid var(--accent);background:var(--accent);color:#fff;font:600 15px var(--body);padding:10px 16px;border-radius:10px;cursor:pointer}
+.btn:disabled{opacity:.45;cursor:default}
+.drop{border:2px dashed var(--line);border-radius:14px;padding:22px;text-align:center;color:var(--muted);font-size:15px}
+.drop input{margin-top:10px}
+.hint{font-size:13.5px;color:var(--faint);margin-top:8px}
+.err{color:var(--no);font-size:14px;margin-top:10px}
+.layout{display:grid;grid-template-columns:340px 1fr;gap:18px;align-items:start;margin-top:18px}
+.verdict{border-radius:16px;padding:22px 24px;border:1px solid var(--line);background:#fff}
+.verdict .tag{display:inline-block;font:700 13px var(--body);letter-spacing:.08em;text-transform:uppercase;padding:5px 12px;border-radius:999px}
+.verdict h2{font-size:clamp(26px,3.4vw,36px);margin-top:12px}
+.verdict ul{margin:14px 0 0;padding-left:20px;display:grid;gap:8px;color:#323848}
+.v-ship .tag{background:var(--ship-soft);color:var(--ship)} .v-ship{border-color:#bfe3cb}
+.v-no .tag{background:var(--no-soft);color:var(--no)} .v-no{border-color:#f3c4c4}
+.v-longer .tag{background:var(--longer-soft);color:var(--longer)} .v-longer{border-color:#efdca8}
+.v-fix .tag{background:var(--fix-soft);color:var(--fix)} .v-fix{border-color:#d9c8f8}
+.clist{list-style:none;margin:12px 0 0;padding:0;display:grid;gap:10px}
+.clist li{display:grid;grid-template-columns:26px 1fr;gap:10px;align-items:start;font-size:14.5px}
+.clist .ic{width:24px;height:24px;border-radius:50%;display:grid;place-items:center;font:700 13px var(--body)}
+.ic.pass{background:var(--ship-soft);color:var(--ship)} .ic.warn{background:var(--longer-soft);color:var(--longer)} .ic.fail{background:var(--no-soft);color:var(--no)} .ic.skip{background:#eef0f4;color:var(--faint)}
+.clist b{display:block}
+.clist span{color:var(--muted)}
+.table-wrap{overflow-x:auto;margin-top:12px}
+table{width:100%;border-collapse:collapse;font-size:14.5px;min-width:620px}
+th,td{text-align:left;padding:10px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--faint);font-weight:600}
+td.n,th.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+td .role{display:block;font-size:12.5px;color:var(--faint)}
+.pos{color:var(--ship)} .neg{color:var(--no)}
+svg.chart{width:100%;height:auto;display:block;margin-top:10px}
+svg.chart text{font:12px var(--body);fill:var(--faint)}
+.legend{display:flex;gap:16px;flex-wrap:wrap;font-size:13px;color:var(--muted);margin-top:6px}
+.legend i{display:inline-block;width:12px;height:3px;border-radius:2px;margin-right:6px;vertical-align:middle}
+.stack{display:grid;gap:18px}
+.src{font-size:13.5px;color:var(--faint);margin-top:10px}
+.hidden{display:none!important}
+footer{margin:40px 0 0;border-top:1px solid var(--line);background:#fff}
+footer .wrap{padding:22px 20px 34px;font-size:13.5px;color:var(--muted);display:grid;gap:6px}
+.layout>*,.stack>*{min-width:0}
+@media (max-width:980px){.layout{grid-template-columns:1fr}.layout>aside{order:2}}
+@media (max-width:640px){svg.chart text{font-size:24px}}
+@media (max-width:420px){.brand{font-size:16px;gap:8px}.brand i{width:22px;height:22px}.top nav{gap:12px;font-size:13.5px}}
+@media (max-width:640px){.demos,.grid2,.grid3{grid-template-columns:1fr}.top nav a.hide-sm{display:none}.card{padding:18px}.intro p{font-size:16.5px}}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="./"><i aria-hidden="true"></i>Experiment Readout</a>
+    <nav>
+      <a href="https://github.com/costasxeras-stack/experiment-readout/blob/main/docs/case-study.md">Case study</a>
+      <a class="hide-sm" href="https://github.com/costasxeras-stack/experiment-readout">GitHub</a>
+      <a href="https://kostasxeras.com/">Portfolio</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="intro">
+    <span class="ver">v0.1.0</span>
+    <h1>Check an A/B test before you trust it.</h1>
+    <p>Load a test result. The readout checks the data first (group split, wrong versions shown, duplicate users, outliers), then the metrics, and gives one of four calls with the reasons: ship, don't ship, run longer, or fix the data first.</p>
+  </section>
+
+  <section class="card">
+    <div class="step"><b>1</b><h2>Load a test</h2></div>
+    <div class="tabs" role="group" aria-label="How to load a test">
+      <button data-tab="demo" aria-pressed="true">Example tests</button>
+      <button data-tab="upload" aria-pressed="false">Upload a CSV</button>
+      <button data-tab="counts" aria-pressed="false">Type in counts</button>
+    </div>
+
+    <div id="tab-demo">
+      <div class="demos">
+        <button class="demo" data-demo="demo-landing-page.json" aria-pressed="false"><b>Landing page test</b><span>294,478 rows. Old page against new page, conversion. Public teaching dataset, January 2017.</span></button>
+        <button class="demo" data-demo="demo-cookie-cats.json" aria-pressed="false"><b>Mobile game gate test</b><span>90,189 players of Cookie Cats. First gate at level 30 or 40, retention after 1 and 7 days.</span></button>
+      </div>
+      <p class="hint">Both examples are public datasets. They were summarised by this app's own code, so the numbers match what you would get by uploading the files.</p>
+    </div>
+
+    <div id="tab-upload" class="hidden">
+      <div class="drop"><b>One row per user.</b> Columns for the group, and one or more metrics (0/1, true/false or numbers). Optional: user ID, version shown, timestamp.<br><input id="file" type="file" accept=".csv,text/csv" aria-label="CSV file"></div>
+      <p class="hint">The file stays in your browser. Nothing is uploaded to a server.</p>
+      <div id="mapping" class="hidden" style="margin-top:16px">
+        <div class="grid3">
+          <label class="field"><span>Group column</span><select id="m-group"></select></label>
+          <label class="field"><span>Control group value</span><select id="m-control"></select></label>
+          <label class="field"><span>User ID (optional)</span><select id="m-id"></select></label>
+          <label class="field"><span>Version shown (optional)</span><select id="m-shown"></select></label>
+          <label class="field"><span>Timestamp (optional)</span><select id="m-time"></select></label>
+        </div>
+        <div class="field" style="margin-top:12px"><span>Metrics</span><div class="checks-in" id="m-metrics"></div></div>
+        <div style="margin-top:14px"><button class="btn" id="analyse">Analyse</button></div>
+      </div>
+      <div class="err" id="upload-err"></div>
+    </div>
+
+    <div id="tab-counts" class="hidden">
+      <div class="grid2">
+        <label class="field"><span>Control: users</span><input id="c-nA" type="number" min="1" inputmode="numeric"></label>
+        <label class="field"><span>Control: users who converted</span><input id="c-xA" type="number" min="0" inputmode="numeric"></label>
+        <label class="field"><span>Treatment: users</span><input id="c-nB" type="number" min="1" inputmode="numeric"></label>
+        <label class="field"><span>Treatment: users who converted</span><input id="c-xB" type="number" min="0" inputmode="numeric"></label>
+      </div>
+      <div style="margin-top:14px"><button class="btn" id="counts-go">Analyse</button></div>
+      <p class="hint">With counts only, the duplicate and wrong-version checks cannot run.</p>
+      <div class="err" id="counts-err"></div>
+    </div>
+  </section>
+
+  <div id="result" class="layout hidden">
+    <aside class="card">
+      <div class="step"><b>2</b><h2>Your decision rules</h2></div>
+      <p class="sub">The call follows these rules. Change them and it updates.</p>
+      <div class="stack" style="margin-top:14px;gap:12px">
+        <label class="field"><span>Primary metric</span><select id="s-primary"></select></label>
+        <div class="field"><span>Guardrails (must not get worse)</span><div class="checks-in" id="s-guards"></div></div>
+        <div class="field"><span>Lower is better for</span><div class="checks-in" id="s-lower"></div></div>
+        <div class="grid2">
+          <label class="field"><span>Smallest lift worth shipping (%)</span><input id="s-minlift" type="number" step="0.1" min="0" value="1"></label>
+          <label class="field"><span>Guardrail tolerance (%)</span><input id="s-tol" type="number" step="0.1" min="0" value="1"></label>
+          <label class="field"><span>Significance level</span><select id="s-alpha"><option value="0.05">0.05</option><option value="0.01">0.01</option><option value="0.1">0.10</option></select></label>
+          <label class="field"><span>Planned share in control (%)</span><input id="s-share" type="number" step="1" min="1" max="99" value="50"></label>
+          <label class="field"><span>Split check threshold</span><select id="s-srm"><option value="0.01">p &lt; 0.01</option><option value="0.001">p &lt; 0.001</option></select></label>
+        </div>
+        <p class="hint">The two percentages are your assumptions about what matters for this product. The starting values are not recommendations.</p>
+      </div>
+    </aside>
+
+    <div class="stack">
+      <section id="verdict" class="verdict" aria-live="polite"></section>
+      <section class="card"><h2>Data checks</h2><p class="sub">Run before any metric is read.</p><ul class="clist" id="checks"></ul></section>
+      <section class="card"><h2>Metrics</h2><p class="sub">Relative change of treatment against control, with a 95% interval. "Detectable" is the smallest change this test finds 80% of the time.</p>
+        <div class="table-wrap"><table><thead><tr><th>Metric</th><th class="n">Control</th><th class="n">Treatment</th><th class="n">Change</th><th class="n">95% interval</th><th class="n">p</th><th class="n">Detectable</th></tr></thead><tbody id="metrics"></tbody></table></div>
+      </section>
+      <section class="card hidden" id="daily-card"><h2>Primary metric by day</h2><p class="sub">A gap that shrinks over time can be a novelty effect.</p>
+        <svg class="chart" id="daily" viewBox="0 0 720 280" role="img" aria-label="Primary metric per day for both groups"></svg>
+        <div class="legend" id="daily-legend"></div>
+      </section>
+      <p class="src" id="source"></p>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>Built by <a href="https://kostasxeras.com/">Konstantinos Xeras</a> with Claude (Anthropic) as engineering partner. <a href="https://github.com/costasxeras-stack/experiment-readout">Code, tests and decisions on GitHub</a>.</span>
+    <span>Statistics: two-proportion z-test for rates, Welch's test for averages, chi-square for the split, all with a normal approximation. Checked against SciPy on both example datasets.</span>
+  </div>
+</footer>
+
+<script src="engine.js"></script>
+<script>
+(function () {
+  var $ = function (id) { return document.getElementById(id); };
+  var S = null, META = null; // current summary and its source note
+  var esc = function (s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); };
+
+  // Tabs
+  document.querySelectorAll('.tabs button').forEach(function (b) {
+    b.addEventListener('click', function () {
+      document.querySelectorAll('.tabs button').forEach(function (x) { x.setAttribute('aria-pressed', x === b); });
+      ['demo', 'upload', 'counts'].forEach(function (t) { $('tab-' + t).classList.toggle('hidden', t !== b.dataset.tab); });
+    });
+  });
+
+  // Example tests
+  document.querySelectorAll('.demo').forEach(function (b) {
+    b.addEventListener('click', function () {
+      document.querySelectorAll('.demo').forEach(function (x) { x.setAttribute('aria-pressed', x === b); });
+      fetch('data/' + b.dataset.demo).then(function (r) { return r.json(); }).then(function (d) {
+        load(d.summary, d.meta.source + ' ' + d.summary.rowsIn.toLocaleString('en') + ' rows in, ' + d.summary.cleanRows.toLocaleString('en') + ' after cleaning.', d.meta.defaults);
+      }).catch(function () { alert('The example could not load. Refresh and try again.'); });
+    });
+  });
+
+  // Upload
+  var PARSED = null;
+  $('file').addEventListener('change', function (e) {
+    var f = e.target.files[0]; $('upload-err').textContent = ''; if (!f) return;
+    var rd = new FileReader();
+    rd.onload = function () {
+      try {
+        PARSED = ER.parseCsv(String(rd.result));
+        if (!PARSED.head.length || !PARSED.rows.length) throw new Error('The file has no data rows.');
+        var g = ER.guessMapping(PARSED); var opts = ['<option value="">(none)</option>'].concat(PARSED.head.map(function (h) { return '<option>' + esc(h) + '</option>'; })).join('');
+        ['m-group', 'm-id', 'm-shown', 'm-time'].forEach(function (id) { $(id).innerHTML = opts; });
+        $('m-group').value = g.group || ''; $('m-id').value = g.id || ''; $('m-shown').value = g.shown || ''; $('m-time').value = g.time || '';
+        $('m-metrics').innerHTML = PARSED.head.map(function (h) { return '<label><input type="checkbox" value="' + esc(h) + '"' + (g.metrics.indexOf(h) >= 0 ? ' checked' : '') + '>' + esc(h) + '</label>'; }).join('');
+        fillControl(); $('mapping').classList.remove('hidden');
+      } catch (err) { $('upload-err').textContent = err.message; }
+    };
+    rd.readAsText(f);
+  });
+  function fillControl() {
+    var j = PARSED.head.indexOf($('m-group').value); var vals = j < 0 ? [] : Array.from(new Set(PARSED.rows.slice(0, 50000).map(function (r) { return r[j].trim(); }))).slice(0, 10);
+    $('m-control').innerHTML = vals.map(function (v) { return '<option>' + esc(v) + '</option>'; }).join('');
+    var c = vals.find(function (v) { return /control|^a$|old|base/i.test(v); }); if (c) $('m-control').value = c;
+  }
+  $('m-group').addEventListener('change', fillControl);
+  $('analyse').addEventListener('click', function () {
+    $('upload-err').textContent = '';
+    var metrics = Array.from($('m-metrics').querySelectorAll('input:checked')).map(function (x) { return x.value; });
+    try {
+      if (!$('m-group').value) throw new Error('Choose the group column.');
+      if (!metrics.length) throw new Error('Choose at least one metric.');
+      var sum = ER.summarise(PARSED, { group: $('m-group').value, control: $('m-control').value, id: $('m-id').value || null, shown: $('m-shown').value || null, time: $('m-time').value || null, metrics: metrics });
+      load(sum, 'Your file: ' + sum.rowsIn.toLocaleString('en') + ' rows in, ' + sum.cleanRows.toLocaleString('en') + ' after cleaning. It stayed in your browser.', { primary: metrics[0], guardrails: metrics.slice(1) });
+    } catch (err) { $('upload-err').textContent = err.message; }
+  });
+
+  // Counts
+  $('counts-go').addEventListener('click', function () {
+    var v = ['nA', 'xA', 'nB', 'xB'].map(function (k) { return Number($('c-' + k).value); });
+    $('counts-err').textContent = '';
+    if (v.some(function (x) { return !isFinite(x) || x < 0; }) || !v[0] || !v[2]) { $('counts-err').textContent = 'Fill in all four numbers.'; return; }
+    if (v[1] > v[0] || v[3] > v[2]) { $('counts-err').textContent = 'Converted users cannot be more than users.'; return; }
+    load(ER.fromCounts({ nA: v[0], xA: v[1], nB: v[2], xB: v[3] }), 'Typed-in counts.', { primary: 'conversions', guardrails: [] });
+  });
+
+  function load(sum, source, defaults) {
+    S = sum; META = source;
+    $('s-primary').innerHTML = sum.metrics.map(function (m) { return '<option>' + esc(m) + '</option>'; }).join('');
+    $('s-primary').value = defaults.primary;
+    var box = function (cls, checked) { return sum.metrics.map(function (m) { return '<label><input type="checkbox" class="' + cls + '" value="' + esc(m) + '"' + (checked(m) ? ' checked' : '') + '>' + esc(m) + '</label>'; }).join(''); };
+    $('s-guards').innerHTML = box('g', function (m) { return defaults.guardrails.indexOf(m) >= 0; }) || '<span class="hint">Only one metric.</span>';
+    $('s-lower').innerHTML = box('l', function () { return false; });
+    $('result').classList.remove('hidden');
+    render();
+    $('verdict').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  ['s-primary', 's-minlift', 's-tol', 's-alpha', 's-share', 's-srm'].forEach(function (id) { $(id).addEventListener('input', render); });
+  ['s-guards', 's-lower'].forEach(function (id) { $(id).addEventListener('change', render); });
+
+  var TITLES = { ship: ['Ship', 'Ship it'], no: ["Don't ship", "Don't ship"], longer: ['Run longer', 'Run the test longer'], fix: ['Fix the data first', 'Fix the data first'] };
+  function render() {
+    if (!S) return;
+    var primary = $('s-primary').value;
+    var lower = {}; document.querySelectorAll('#s-lower input:checked').forEach(function (x) { lower[x.value] = false; });
+    var settings = {
+      primary: primary,
+      guardrails: Array.from(document.querySelectorAll('#s-guards input:checked')).map(function (x) { return x.value; }).filter(function (m) { return m !== primary; }),
+      alpha: Number($('s-alpha').value), minLift: Math.max(0, Number($('s-minlift').value) || 0) / 100, guardrailTol: Math.max(0, Number($('s-tol').value) || 0) / 100,
+      srmAlpha: Number($('s-srm').value), plannedShare: Math.min(0.99, Math.max(0.01, (Number($('s-share').value) || 50) / 100)), higherIsBetter: lower,
+    };
+    var r = ER.readout(S, settings), F = ER.fmt;
+    var t = TITLES[r.decision];
+    $('verdict').className = 'verdict v-' + r.decision;
+    $('verdict').innerHTML = '<span class="tag">' + t[0] + '</span><h2>' + t[1] + '</h2><ul>' + r.reasons.map(function (x) { return '<li>' + esc(x) + '</li>'; }).join('') + '</ul>';
+    var icon = { pass: '✓', warn: '!', fail: '✕', skip: '–' };
+    $('checks').innerHTML = r.checks.map(function (c) { return '<li><span class="ic ' + c.status + '" aria-label="' + c.status + '">' + icon[c.status] + '</span><div><b>' + esc(c.label) + '</b><span>' + esc(c.detail) + '</span></div></li>'; }).join('');
+    var rows = [{ r: r.primary, role: 'Primary' }].concat(r.guards.map(function (g) { return { r: g, role: 'Guardrail' }; }));
+    $('metrics').innerHTML = rows.map(function (x) {
+      var m = x.r, good = (settings.higherIsBetter[m.metric] === false ? -1 : 1) * m.diff;
+      var cls = m.significant ? (good > 0 ? 'pos' : 'neg') : '';
+      return '<tr><td>' + esc(m.metric) + '<span class="role">' + x.role + (m.heavyTail ? ', has outliers' : '') + '</span></td><td class="n">' + F.fmtVal(m.meanA, m.kind) + '</td><td class="n">' + F.fmtVal(m.meanB, m.kind) + '</td><td class="n ' + cls + '">' + F.signPct(m.rel) + '</td><td class="n">' + F.signPct(m.relLo) + ' to ' + F.signPct(m.relHi) + '</td><td class="n">' + F.fmtP(m.p) + '</td><td class="n">±' + (m.relMde * 100).toFixed(2) + '%</td></tr>';
+    }).join('');
+    drawDaily();
+    $('source').textContent = META;
+  }
+
+  function drawDaily() {
+    var d = S.daily; $('daily-card').classList.toggle('hidden', !d);
+    if (!d) return;
+    var days = Object.keys(d).sort(), groups = [S.control, S.treatment], colors = ['var(--a)', 'var(--b)'];
+    var series = groups.map(function (g) { return days.map(function (day) { var x = d[day][g]; return x && x.n >= 30 ? x.sum / x.n : null; }); });
+    var vals = series.flat().filter(function (v) { return v != null; }); if (!vals.length) return;
+    var lo = Math.min.apply(null, vals), hi = Math.max.apply(null, vals), pad = (hi - lo) * 0.15 || 0.01; lo -= pad; hi += pad;
+    var W = 720, H = 280, L = window.innerWidth < 640 ? 100 : 56, R = 704, T = 14, B = 240;
+    var x = function (i) { return L + (days.length === 1 ? 0 : i / (days.length - 1)) * (R - L); }, y = function (v) { return B - (v - lo) / (hi - lo) * (B - T); };
+    var isRate = S.metricKinds[S.metrics[0]] === 'rate';
+    var g = '';
+    for (var k = 0; k <= 4; k++) { var v = lo + (hi - lo) * k / 4; g += '<line x1="' + L + '" x2="' + R + '" y1="' + y(v) + '" y2="' + y(v) + '" stroke="var(--line)" stroke-dasharray="3 4"/><text x="' + (L - 8) + '" y="' + (y(v) + 4) + '" text-anchor="end">' + (isRate ? (v * 100).toFixed(1) + '%' : v.toFixed(1)) + '</text>'; }
+    [0, Math.floor((days.length - 1) / 2), days.length - 1].forEach(function (i) { g += '<text x="' + x(i) + '" y="' + (B + 30) + '" text-anchor="middle">' + days[i].slice(5) + '</text>'; });
+    series.forEach(function (s, si) {
+      var path = ''; s.forEach(function (v, i) { if (v == null) return; path += (path ? 'L' : 'M') + x(i).toFixed(1) + ' ' + y(v).toFixed(1); });
+      g += '<path d="' + path + '" fill="none" stroke="' + colors[si] + '" stroke-width="2.5"/>';
+    });
+    $('daily').innerHTML = g;
+    $('daily-legend').innerHTML = groups.map(function (gr, i) { return '<span><i style="background:' + colors[i] + '"></i>' + esc(gr) + '</span>'; }).join('') + '<span>' + esc(S.metrics[0]) + ', days with at least 30 users</span>';
+  }
+})();
+</script>
+</body>
+</html>
