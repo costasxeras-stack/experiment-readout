@@ -1,0 +1,12 @@
+{
+  "name": "experiment-readout",
+  "version": "0.1.0",
+  "description": "Check an A/B test before you trust it, then get a ship, don't ship, run longer or fix-the-data call with the reasons.",
+  "private": true,
+  "scripts": {
+    "demos": "node scripts/build-demos.js scripts/ab_data.csv scripts/cookie_cats.csv",
+    "test": "python3 tests/check-against-scipy.py",
+    "serve": "python3 -m http.server 8000"
+  },
+  "license": "MIT"
+}
