@@ -51,9 +51,9 @@ Limits: one primary metric and one comparison per test, no correction for lookin
 - Cookie Cats: public player-level data from the mobile game Cookie Cats by Tactile Entertainment, shared for teaching by DataCamp. Licence not stated.
 - The raw files are not in this repo. `data/demo-*.json` holds the summaries the app's own engine produced from them (`scripts/build-demos.js`).
 
-## How it was built
+## My role
 
-I framed the problem, chose the checks, set the decision rules and wrote the findings. Claude (Anthropic) was my engineering partner for the code. Decisions are recorded in [docs/decisions](docs/decisions).
+I framed the problem, chose the checks, set the decision rules and wrote the findings. Decisions are recorded in [docs/decisions](docs/decisions).
 
 ## Run it locally
 

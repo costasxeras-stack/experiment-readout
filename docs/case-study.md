@@ -66,4 +66,4 @@ With the smallest worthwhile lift set to 0.5% instead of 1%, the landing page ca
 
 ## My role
 
-I framed the problem, chose the checks and the decision rules, picked the datasets and wrote the findings. Claude (Anthropic) wrote the code with me and ran the tests.
+I framed the problem, chose the checks and the decision rules, picked the datasets and wrote the findings.
